@@ -16,6 +16,7 @@ import cn.slimsmart.thrift.rpc.ThriftServiceClientProxyFactory;
 //客户端调用
 @SuppressWarnings("resource")
 public class Client {
+	static long startTime = 0;
 	public static void main(String[] args) {
 		//simple();
 		spring();
@@ -25,7 +26,12 @@ public class Client {
 		try {
 			final ApplicationContext context = new ClassPathXmlApplicationContext("spring-context-thrift-client.xml");
 			EchoSerivce.Iface echoSerivce = (EchoSerivce.Iface) context.getBean("echoSerivce");
-			System.out.println(echoSerivce.echo("hello--echo"));
+			startTime = System.currentTimeMillis();
+			for (int i = 0; i < 10000; i++) {
+				Thread.sleep(3000);
+				TThread thread = new TThread(echoSerivce);
+				thread.start();
+			}
 			//关闭连接的钩子
 			Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
@@ -49,10 +55,8 @@ public class Client {
 		}
 		public void run() {
 			try {
-				for (int i = 0; i < 10; i++) {
-					Thread.sleep(1000*i);
-					System.out.println(Thread.currentThread().getName()+"  "+echoSerivce.echo("hello"));
-				}
+				System.err.println(Thread.currentThread().getName()+"  "+echoSerivce.echo("hello"));
+				System.err.println("totalTime:"+(System.currentTimeMillis()-startTime));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

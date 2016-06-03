@@ -200,4 +200,9 @@ public class ThriftServerAddressProviderZookeeper implements ThriftServerAddress
 		return service;
 	}
 
+	@Override
+	public int providerNum() {
+		return container.size();
+	}
+
 }

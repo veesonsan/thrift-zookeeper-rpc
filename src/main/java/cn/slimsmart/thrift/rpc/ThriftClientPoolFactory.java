@@ -5,7 +5,7 @@ import java.net.InetSocketAddress;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.TServiceClientFactory;
-import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
@@ -83,11 +83,11 @@ public class ThriftClientPoolFactory extends BasePoolableObjectFactory<TServiceC
 	public TServiceClient makeObject() throws Exception {
 		InetSocketAddress address = serverAddressProvider.selector();
 		if(address==null){
-			new ThriftException("No provider available for remote service");
+			throw new ThriftException("No provider available for remote service");
 		}
 		TSocket tsocket = new TSocket(address.getHostName(), address.getPort());
 		TTransport transport = new TFramedTransport(tsocket);
-		TProtocol protocol = new TBinaryProtocol(transport);
+		TProtocol protocol = new TCompactProtocol(transport);//TBinaryProtocol
 		TServiceClient client = this.clientFactory.getClient(protocol);
 		transport.open();
 		if (callback != null) {

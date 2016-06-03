@@ -72,19 +72,26 @@ public class ThriftServiceClientProxyFactory implements FactoryBean, Initializin
 		ThriftClientPoolFactory clientPool = new ThriftClientPoolFactory(serverAddressProvider, clientFactory, callback);
 		GenericObjectPool.Config poolConfig = new GenericObjectPool.Config();
 		poolConfig.maxActive = maxActive;
-		poolConfig.maxIdle = 1;
-		poolConfig.minIdle = 0;
+//		poolConfig.maxIdle = maxActive;
+//		poolConfig.minIdle = 0;
 		poolConfig.minEvictableIdleTimeMillis = idleTime;
 		poolConfig.timeBetweenEvictionRunsMillis = idleTime * 2L;
 		poolConfig.testOnBorrow=true;
 		poolConfig.testOnReturn=false;
 		poolConfig.testWhileIdle=false;
+		poolConfig.lifo=false;
 		pool = new GenericObjectPool<TServiceClient>(clientPool, poolConfig);
 		proxyClient = Proxy.newProxyInstance(classLoader, new Class[] { objectClass }, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				//
+//				System.err.println("NumActive:"+pool.getNumActive());
+//				System.err.println("NumIdle:"+pool.getNumIdle());
+//				if (pool.getNumIdle()<pool.getMaxIdle()) {
+//					pool.addObject();
+//				}
+//				pool.addObject();
 				TServiceClient client = pool.borrowObject();
+				System.err.println(client.hashCode());
 				boolean flag = true;
 				try {
 					return method.invoke(client, args);

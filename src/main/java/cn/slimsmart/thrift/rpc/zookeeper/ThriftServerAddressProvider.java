@@ -24,4 +24,10 @@ public interface ThriftServerAddressProvider extends Closeable {
      * @return
      */
     InetSocketAddress selector();
+    
+    /**
+     * 提供者数量
+     * @return
+     */
+    int providerNum();
 }
